@@ -8,44 +8,78 @@
 
 import UIKit
 
-class SongLIstTableViewController: UITableViewController {
+class SongListTableViewController: UITableViewController {
     let allSongs = Song.loveSongs
     
     
-    @IBOutlet weak var songSearchBar: UISearchBar!
+    @IBOutlet weak var songSearchBarOutlet: UISearchBar!
     
-
+    
+    var songSearchResult: [Song] {
+        get {
+            guard let searchSongString = searchSongString else {
+                return allSongs
+            }
+            guard searchSongString != ""  else {
+                return allSongs
+            }
+            if let scopeTitles = songSearchBarOutlet
+.scopeButtonTitles {
+                let currentScopeIndex = songSearchBarOutlet.selectedScopeButtonIndex
+                switch scopeTitles[currentScopeIndex] {
+                    
+                case "Song Title":
+                    return allSongs.filter{$0.name.contains(searchSongString.lowercased())}
+                case "Artist Name":
+                    return allSongs.filter{$0.artist.contains(searchSongString.lowercased())}
+                default:
+                    return allSongs
+                }
+            }
+            return allSongs
+        }
+    }
+    
+    var searchSongString: String? = nil {
+        didSet {
+            print(searchSongString!)
+            self.tableView.reloadData()
+        }
+    }
+            
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        songSearchBarOutlet.delegate = self
+    }
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
 
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem
-    }
-
+    
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
         // #warning Incomplete implementation, return the number of sections
-        return 0
+        return 1
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return 0
+        return songSearchResult.count
     }
 
-    /*
+    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "reuseIdentifier", for: indexPath)
-
-        // Configure the cell...
-
-        return cell
+        if let cell = tableView.dequeueReusableCell(withIdentifier: "songsCell", for: indexPath) as? SongInfoTableViewCell{cell.songTitle?.text = songSearchResult[indexPath.row].name
+        
+            cell.artistName?.text = songSearchResult[indexPath.row].artist
+            return cell
+        }
+        
+        return UITableViewCell()
     }
-    */
+    
 
     /*
     // Override to support conditional editing of the table view.
@@ -93,3 +127,11 @@ class SongLIstTableViewController: UITableViewController {
     */
 
 }
+
+extension SongListTableViewController: UISearchBarDelegate {
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        searchSongString = searchBar.text
+    }
+}
+
+

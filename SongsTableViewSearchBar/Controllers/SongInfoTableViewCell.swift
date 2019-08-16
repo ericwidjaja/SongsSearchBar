@@ -12,6 +12,7 @@ class SongInfoTableViewCell: UITableViewCell {
 
     @IBOutlet weak var songTitle: UILabel!
     
+    
     @IBOutlet weak var artistName: UILabel!
     
     
